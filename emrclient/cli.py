@@ -1,0 +1,112 @@
+#!/usr/bin/env python3
+'''
+Helper script to list applications and kill applications from a remote EMR. Also may add steps to EMR cluster
+'''
+
+import click
+import json
+import requests
+from tabulate import tabulate
+from os.path import expanduser
+import os.path
+import re
+from config import Config
+import datetime
+from datetime import timedelta
+
+cache_file_location = expanduser("~") + "/.emrclient"
+
+
+@click.group()
+def cli():
+    pass
+
+
+@cli.command()
+@click.option('-m', '--master-address', help='ip:port of master web api. Default\'s port to 8088 if no port given')
+@click.option('-b', '--s3-bucket', help='s3 bucket to store the spark job jars')
+def configure(master_address, s3_bucket):
+    if os.path.exists(cache_file_location):
+
+        with open(cache_file_location, "r") as file_contents:
+            json_contents = json.load(file_contents)
+
+            if not master_address:
+                master_address = json_contents['master']
+            else:
+                master_address = normalise_master_address(master_address)
+
+            if not s3_bucket:
+                s3_bucket = json_contents['s3_bucket']
+
+            emr_client_config = Config(master_address, s3_bucket)
+            file_contents.close()
+    else:
+        master_address = normalise_master_address(master_address)
+        emr_client_config = Config(master_address, s3_bucket)
+
+    emr_cache_file = open(cache_file_location, "w")
+
+    emr_cache_file.write(emr_client_config.to_JSON())
+    emr_cache_file.close()
+
+
+def normalise_master_address(master_address):
+    ends_with_port = re.compile('.*?:\n+$')
+    starts_with_http = re.compile('^http://.*?')
+
+    if not ends_with_port.match(master_address):
+        master_address += ":8088"
+
+    if not starts_with_http.match(master_address):
+        master_address = "http://" + master_address
+
+    return master_address
+
+
+@cli.command()
+def list():
+    with open(cache_file_location, "r") as file_contents:
+        json_contents = json.load(file_contents)
+        emr_client_config = Config(json_contents['master_address'], json_contents['s3_bucket'])
+
+    response = requests.get(emr_client_config.master_address + '/ws/v1/cluster/apps?state=RUNNING')
+
+    headers = ['Started-Time', 'Finished-Time', 'Application-Id', 'Application-Name', 'Application-Type', 'User',
+               'Queue', 'State', 'Final-State', 'Elapsed-Time', 'Progress', 'Tracking-URL']
+    data = []
+    print('')
+    for app in response.json()['apps']['app']:
+        data.append([normalise_time(app['startedTime']),
+                     normalise_time(app['finishedTime']),
+                     app['id'], app['name'], app['applicationType'],
+                     app['user'], app['queue'], app['state'],
+                     app['finalStatus'],
+                     timedelta(seconds = app['elapsedTime']/1000.0),
+                     '{:}%'.format(app['progress']),
+                     app['trackingUrl']])
+
+    print(tabulate(data, headers, tablefmt='plain'))
+
+
+def normalise_time(time):
+    if not time == 0:
+        return datetime.datetime.fromtimestamp(time / 1000.0).strftime('%Y-%m-%d %H:%M:%S')
+    return '-'
+
+
+@cli.command()
+@click.argument('application_id')
+def kill(application_id):
+    print('application_id')
+    # command = yarn_pre_application_command + " -kill " + application_id
+    # print("executing command..." + command)
+    # os.system(command)
+
+
+def main():
+    cli()
+
+
+if __name__ == '__main__':
+    main()

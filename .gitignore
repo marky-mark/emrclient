@@ -1,0 +1,5 @@
+.idea
+*.iml
+*.tar.gz
+MANIFEST
+**__pycache__**
