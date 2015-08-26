@@ -18,11 +18,15 @@ Display help
 Set the master ip and port of the EMR master instance and yarn api (default 8088), this can be found in the EC2 tab. This caches the address 
 in `~/.emrclient`
 
-    ./emrclient set_master <MASTER IP:PORT>
+    ./emrclient configure -m <MASTER IP:PORT> -b <S3 BUCKET>
     
-Once this is set you may list applications 
+Once this is set you may list applications by state(RUNNING, KILLED, FAILED)
 
-    ./emrclient list
+    ./emrclient list <STATE>
+    
+Once this is set you may list applications by running
+
+    ./emrclient list_running
     
 Pick an application from the list to kill
 
