@@ -63,14 +63,21 @@ def normalise_master_address(master_address):
 
     return master_address
 
+@cli.command()
+def list_running():
+    list_by_state('RUNNING')
 
 @cli.command()
-def list():
+@click.argument('state')
+def list(state):
+    list_by_state(state)
+
+def list_by_state(state):
     with open(cache_file_location, "r") as file_contents:
         json_contents = json.load(file_contents)
         emr_client_config = Config(json_contents['master_address'], json_contents['s3_bucket'])
 
-    response = requests.get(emr_client_config.master_address + '/ws/v1/cluster/apps?state=RUNNING')
+    response = requests.get(emr_client_config.master_address + '/ws/v1/cluster/apps?state=' + state)
 
     headers = ['Started-Time', 'Finished-Time', 'Application-Id', 'Application-Name', 'Application-Type', 'User',
                'Queue', 'State', 'Final-State', 'Elapsed-Time', 'Progress', 'Tracking-URL']
