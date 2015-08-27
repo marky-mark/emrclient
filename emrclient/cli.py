@@ -17,11 +17,9 @@ from yarncli import YarnClient
 
 cache_file_location = expanduser("~") + "/.emrclient"
 
-
 @click.group()
 def cli():
     pass
-
 
 @cli.command()
 @click.option('-m', '--master-address', help='ip:port of master web api. Default\'s port to 8088 if no port given')
@@ -76,33 +74,31 @@ def list(master_address, state):
     list_by_state(master_address, state)
 
 def list_by_state(master_address, state):
+    yarn_client = build_yarn_client(master_address)
+    result = yarn_client.list_by_state(state)
+    print(tabulate(result[0], result[1], tablefmt='plain'))
 
+
+def build_yarn_client(master_address):
     if master_address:
         yarn_client = YarnClient(normalise_master_address(master_address))
     else:
         with open(cache_file_location, "r") as file_contents:
             json_contents = json.load(file_contents)
             yarn_client = YarnClient(json_contents['master_address'])
-
-    result = yarn_client.list_by_state(state)
-
-    print(tabulate(result[0], result[1], tablefmt='plain'))
-
+    return yarn_client
 
 def normalise_time(time):
     if not time == 0:
         return datetime.datetime.fromtimestamp(time / 1000.0).strftime('%Y-%m-%d %H:%M:%S')
     return '-'
 
-
 @cli.command()
 @click.argument('application_id')
-def kill(application_id):
-    print('application_id')
-    # command = yarn_pre_application_command + " -kill " + application_id
-    # print("executing command..." + command)
-    # os.system(command)
-
+@click.option('-m', '--master-address', help='Overwrite the address of master web api. Default port 8088. Not cached')
+def kill(application_id, master_address):
+    yarn_client = build_yarn_client(master_address)
+    yarn_client.kill(application_id)
 
 def main():
     cli()

@@ -21,16 +21,20 @@ Set the master ip and port of the EMR master instance and yarn api (default 8088
 in `~/.emrclient`
 
     ./emrclient configure -m <MASTER IP:PORT> -b <S3 BUCKET>
-    
-Once this is set you may list applications by state(RUNNING, KILLED, FAILED)
-
-    ./emrclient list <STATE>
 
 ##### List Running Applications
     
 Once this is set you may list applications by running
 
     ./emrclient list_running
+
+Alternatively the master may be temporally overwritten by using `-m <MASTER ADDRESS>`
+   
+##### List Applications by State
+    
+Once this is set you may list applications by state(RUNNING, KILLED, FAILED)
+
+    ./emrclient list <STATE>
 
 Alternatively the master may be temporally overwritten by using `-m <MASTER ADDRESS>`
    
