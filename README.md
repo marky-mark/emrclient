@@ -11,9 +11,11 @@ Yarn must be installed on machine
 
 In order to use this the master ec2 instance created must be assigned a public ip 
 
-Display help
+##### Display help
     
     ./emrclient --help
+
+##### Configure
 
 Set the master ip and port of the EMR master instance and yarn api (default 8088), this can be found in the EC2 tab. This caches the address 
 in `~/.emrclient`
@@ -23,13 +25,21 @@ in `~/.emrclient`
 Once this is set you may list applications by state(RUNNING, KILLED, FAILED)
 
     ./emrclient list <STATE>
+
+##### List Running Applications
     
 Once this is set you may list applications by running
 
     ./emrclient list_running
-    
+
+Alternatively the master may be temporally overwritten by using `-m <MASTER ADDRESS>`
+   
+##### Kill an Application
+
 Pick an application from the list to kill
 
     ./emrclient kill <APPLICATION ID>
+    
+Alternatively the master may be temporally overwritten by using `-m <MASTER ADDRESS>`
     
     

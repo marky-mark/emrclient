@@ -3,16 +3,17 @@
 Helper script to list applications and kill applications from a remote EMR. Also may add steps to EMR cluster
 '''
 
-import click
 import json
-import requests
-from tabulate import tabulate
 from os.path import expanduser
 import os.path
 import re
-from config import Config
 import datetime
-from datetime import timedelta
+
+import click
+from tabulate import tabulate
+
+from config import Config
+from yarncli import YarnClient
 
 cache_file_location = expanduser("~") + "/.emrclient"
 
@@ -64,36 +65,28 @@ def normalise_master_address(master_address):
     return master_address
 
 @cli.command()
-def list_running():
-    list_by_state('RUNNING')
+@click.option('-m', '--master-address', help='Overwrite the address of master web api. Default port 8088. Not cached')
+def list_running(master_address):
+    list_by_state(master_address, 'RUNNING')
 
 @cli.command()
 @click.argument('state')
-def list(state):
-    list_by_state(state)
+@click.option('-m', '--master-address', help='Overwrite the address of master web api. Default port 8088. Not cached')
+def list(master_address, state):
+    list_by_state(master_address, state)
 
-def list_by_state(state):
-    with open(cache_file_location, "r") as file_contents:
-        json_contents = json.load(file_contents)
-        emr_client_config = Config(json_contents['master_address'], json_contents['s3_bucket'])
+def list_by_state(master_address, state):
 
-    response = requests.get(emr_client_config.master_address + '/ws/v1/cluster/apps?state=' + state)
+    if master_address:
+        yarn_client = YarnClient(normalise_master_address(master_address))
+    else:
+        with open(cache_file_location, "r") as file_contents:
+            json_contents = json.load(file_contents)
+            yarn_client = YarnClient(json_contents['master_address'])
 
-    headers = ['Started-Time', 'Finished-Time', 'Application-Id', 'Application-Name', 'Application-Type', 'User',
-               'Queue', 'State', 'Final-State', 'Elapsed-Time', 'Progress', 'Tracking-URL']
-    data = []
-    print('')
-    for app in response.json()['apps']['app']:
-        data.append([normalise_time(app['startedTime']),
-                     normalise_time(app['finishedTime']),
-                     app['id'], app['name'], app['applicationType'],
-                     app['user'], app['queue'], app['state'],
-                     app['finalStatus'],
-                     timedelta(seconds = app['elapsedTime']/1000.0),
-                     '{:}%'.format(app['progress']),
-                     app['trackingUrl']])
+    result = yarn_client.list_by_state(state)
 
-    print(tabulate(data, headers, tablefmt='plain'))
+    print(tabulate(result[0], result[1], tablefmt='plain'))
 
 
 def normalise_time(time):
