@@ -34,5 +34,4 @@ class YarnClient:
         url_endpoint = self.master_address + '/ws/v1/cluster/apps/' + application_id + "/state"
         response = requests.put(url=url_endpoint,
                                 json={'state': 'KILLED'})
-        if response.status_code == requests.codes.ok:
-            print("successfully killed")
+        return response.status_code == requests.codes.ok
