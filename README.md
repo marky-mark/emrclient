@@ -5,6 +5,10 @@ Currently the amazon api does not include stopping jobs. Also supports adding st
 EMR api does not contain have calls to terminate jobs and so must be done via yarn api. A small layer of caching is also
 added.
 
+### Install via pip
+
+    pip3 install --upgrade emrclient
+
 ### Commands
 
 In order to use the `list_applications` and `kill_application` the master ec2 instance of EMR cluster created must be 
