@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='emrclient',
     packages=['emrclient'],
-    version='0.1',
+    version='0.3',
     description='This is created to view and kill applications/jobs running on yarn inside Amazon EMR or any other remote location. Currently the amazon api does not include stopping jobs. Also supports deploying steps',
     author='Mark Kelly',
     author_email='mkelly28@tcd.ie',
