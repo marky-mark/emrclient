@@ -143,10 +143,10 @@ def get_config(s3_bucket, region, cluster_id):
 @click.option('-f', '--file', help='Upload the file. This will be uploaded to s3 and overwrite whatever is there')
 @click.option('-b', '--s3-bucket', help='Overwrite the s3 bucket location for the file to be uploaded to. Does not get cached')
 @click.option('-s', '--s3-file', help='s3 file for the job. Used if already uploaded')
-@click.option('-c', '--cluster-id', help='cluster id of EMR')
+@click.option('-c', '--cluster-id', help='Overwrite region of cluster. Not cached')
 @click.argument('name')
 @click.argument('main_class')
-@click.option('-r', '--region', help='region of cluster. Not cached')
+@click.option('-r', '--region', help='Overwrite region of cluster. Not cached')
 @click.option('-a', '--args', help='arguments for jar')
 def submit_job(cluster_id, name, args, file, s3_bucket, s3_file, main_class, region):
 

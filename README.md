@@ -45,5 +45,29 @@ Pick an application from the list to kill
     ./emrclient kill <APPLICATION ID>
     
 Alternatively the master may be temporally overwritten by using `-m <MASTER ADDRESS>`
+
+##### Submit job
+
+Pick an application from the list to kill
+
+    ./emrclient submit_job <NAME> <MAIN CLASS> 
+    
+Options
+
+* -f, --file TEXT        Upload the file. This will be uploaded to s3 and overwrite whatever is there
+* -b, --s3-bucket TEXT   Overwrite the s3 bucket location for the file to be uploaded to. Does not get cached
+* -s, --s3-file TEXT     s3 file for the job. Used if already uploaded
+* -c, --cluster-id TEXT  Overwrite the cluster id of EMR. Not cached
+* -r, --region TEXT      Overwrite region of cluster. Not cached
+* -a, --args TEXT        arguments for jar
+* --help                 Display help message
+    
+Example of file already up on s3
+
+    ./cli.py submit_job SmartProduct StreamingApp -a -m,yarn-cluster,-z,XXX.YYY.ZZZ:2181 -s s3://some-bucket/smart-product-assembly-0.0.1-SNAPSHOT.jar
+    
+Example of uploading file to s3 and using it
+
+    ./cli.py submit_job SmartProduct StreamingApp -a -m,yarn-cluster,-z,XXX.YYY.ZZZ:2181 -f /some/file.jar -b some-bucket
     
     
