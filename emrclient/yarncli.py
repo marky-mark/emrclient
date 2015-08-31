@@ -18,15 +18,16 @@ class YarnClient:
                    'Queue', 'State', 'Final-State', 'Elapsed-Time', 'Progress', 'Tracking-URL']
         data = []
         response = requests.get(self.master_address + '/ws/v1/cluster/apps?state=' + state)
-        for app in response.json()['apps']['app']:
-            data.append([normalise_time(app['startedTime']),
-                         normalise_time(app['finishedTime']),
-                         app['id'], app['name'], app['applicationType'],
-                         app['user'], app['queue'], app['state'],
-                         app['finalStatus'],
-                         timedelta(seconds=app['elapsedTime'] / 1000.0),
-                         '{:}%'.format(app['progress']),
-                         app['trackingUrl']])
+        if response._content and 'apps' in response.json():
+            for app in response.json()['apps']['app']:
+                data.append([normalise_time(app['startedTime']),
+                             normalise_time(app['finishedTime']),
+                             app['id'], app['name'], app['applicationType'],
+                             app['user'], app['queue'], app['state'],
+                             app['finalStatus'],
+                             timedelta(seconds=app['elapsedTime'] / 1000.0),
+                             '{:}%'.format(app['progress']),
+                             app['trackingUrl']])
 
         return data, headers
 

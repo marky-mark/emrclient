@@ -1,4 +1,7 @@
 from distutils.core import setup
+import setuptools
+from setuptools.command.test import test as TestCommand
+from setuptools import setup
 
 setup(
     name='emrclient',
@@ -9,9 +12,12 @@ setup(
     author_email='mkelly28@tcd.ie',
     # url='https://github.com/zalando/yarncli',
     # download_url='https://github.com/zalando/yarncli/tarball/0.1',
-    keywords=['emr', 'aws', 'yarn', 'kill', 'view', 'client', 'spark'],
+    keywords=['emr', 'aws', 'yarn', 'kill', 'view', 'client', 'spark', 'api'],
     classifiers=[],
     entry_points={'console_scripts': 'emrclient = emrclient.cli:main'},
-    install_requires=['clickclick','tabulate'],
+    tests_require=['pytest'],
+    test_suite='tests',
+    packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
+    install_requires=['clickclick','tabulate', 'boto3'],
     license='Apache License 2.0'
 )

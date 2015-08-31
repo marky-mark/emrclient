@@ -15,7 +15,15 @@ from tabulate import tabulate
 from config import Config
 from yarncli import YarnClient
 
-cache_file_location = expanduser("~") + "/.emrclient"
+import boto3
+
+cache_address = expanduser("~") + "/.emrclient"
+
+def get_cache_file_location():
+    return cache_address
+
+def set_cache_file_location(cache_address_overwrite):
+    cache_address = cache_address_overwrite
 
 @click.group()
 def cli():
@@ -24,27 +32,35 @@ def cli():
 @cli.command()
 @click.option('-m', '--master-address', help='ip:port of master web api. Default\'s port to 8088 if no port given')
 @click.option('-b', '--s3-bucket', help='s3 bucket to store the spark job jars')
-def configure(master_address, s3_bucket):
-    if os.path.exists(cache_file_location):
+@click.option('-r', '--region', help='Region of cluster. e.g. eu-west-1')
+@click.option('-c', '--cluster-id', help='String value of the cluster id')
+def configure(master_address, s3_bucket, region, cluster_id):
+    if os.path.exists(get_cache_file_location()):
 
-        with open(cache_file_location, "r") as file_contents:
+        with open(get_cache_file_location(), "r") as file_contents:
             json_contents = json.load(file_contents)
 
             if not master_address:
-                master_address = json_contents['master']
+                master_address = json_contents['master_address']
             else:
                 master_address = normalise_master_address(master_address)
 
             if not s3_bucket:
                 s3_bucket = json_contents['s3_bucket']
 
-            emr_client_config = Config(master_address, s3_bucket)
+            if not region:
+                region = json_contents['region']
+
+            if not cluster_id:
+                cluster_id = json_contents['cluster_id']
+
+            emr_client_config = Config(master_address, s3_bucket, region, cluster_id)
             file_contents.close()
     else:
         master_address = normalise_master_address(master_address)
-        emr_client_config = Config(master_address, s3_bucket)
+        emr_client_config = Config(master_address, s3_bucket, region, cluster_id)
 
-    emr_cache_file = open(cache_file_location, "w")
+    emr_cache_file = open(get_cache_file_location(), "w")
 
     emr_cache_file.write(emr_client_config.to_JSON())
     emr_cache_file.close()
@@ -83,7 +99,7 @@ def build_yarn_client(master_address):
     if master_address:
         yarn_client = YarnClient(normalise_master_address(master_address))
     else:
-        with open(cache_file_location, "r") as file_contents:
+        with open(get_cache_file_location(), "r") as file_contents:
             json_contents = json.load(file_contents)
             yarn_client = YarnClient(json_contents['master_address'])
     return yarn_client
@@ -101,9 +117,74 @@ def kill(application_id, master_address):
     if yarn_client.kill(application_id):
         print("successfully killed")
 
+
+def get_config(s3_bucket, region, cluster_id):
+    with open(get_cache_file_location(), "r") as file_contents:
+        json_contents = json.load(file_contents)
+
+        if not s3_bucket:
+            s3_bucket_to_use = json_contents['s3_bucket']
+        else:
+            s3_bucket_to_use = s3_bucket
+
+        if not region:
+            region_to_use = json_contents['region']
+        else:
+            region_to_use = region
+
+        if not cluster_id:
+            cluster_id_to_use = json_contents['cluster_id']
+        else:
+            cluster_id_to_use = cluster_id
+
+        return Config(json_contents['master_address'], s3_bucket_to_use, region_to_use, cluster_id_to_use)
+
+@cli.command()
+@click.option('-f', '--file', help='Upload the file. This will be uploaded to s3 and overwrite whatever is there')
+@click.option('-b', '--s3-bucket', help='Overwrite the s3 bucket location for the file to be uploaded to. Does not get cached')
+@click.option('-s', '--s3-file', help='s3 file for the job. Used if already uploaded')
+@click.option('-c', '--cluster-id', help='cluster id of EMR')
+@click.argument('name')
+@click.argument('main_class')
+@click.option('-r', '--region', help='region of cluster. Not cached')
+@click.option('-a', '--args', help='arguments for jar')
+def submit_job(cluster_id, name, args, file, s3_bucket, s3_file, main_class, region):
+
+    jar_to_use = ''
+
+    config = get_config(s3_bucket, region, cluster_id)
+
+    if file:
+        print('uploading file ' + file + ' to s3 bucket ' + config.s3_bucket)
+        s3_client = boto3.client('s3')
+        file_name = os.path.basename(file)
+        jar_to_use = "s3://" + config.s3_bucket + "/" + file_name
+        s3_client.upload_file(file, s3_bucket, file_name)
+    elif s3_file:
+        print('Using file in s3 ' + s3_file)
+        jar_to_use = s3_file
+
+    emr_client = boto3.client('emr', region_name=config.region)
+
+    response = emr_client.add_job_flow_steps(
+        JobFlowId=config.cluster_id,
+        Steps=[
+            {
+                'Name': name,
+                # TERMINATE_JOB_FLOW'|'TERMINATE_CLUSTER'|'CANCEL_AND_WAIT'|'CONTINUE'
+                'ActionOnFailure':'CONTINUE',
+                'HadoopJarStep': {
+                    'Jar': 'command-runner.jar',
+                    'Args': ['spark-submit', '--deploy-mode', 'cluster', '--class', main_class, jar_to_use] + args.split(',')
+                }
+            },
+        ]
+    )
+
+    print(response)
+
 def main():
     cli()
-
 
 if __name__ == '__main__':
     main()
