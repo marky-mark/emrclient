@@ -20,7 +20,7 @@ In order to use this the master ec2 instance created must be assigned a public i
 Set the master ip and port of the EMR master instance and yarn api (default 8088), this can be found in the EC2 tab. This caches the address 
 in `~/.emrclient`
 
-    ./emrclient configure -m <MASTER IP:PORT> -b <S3 BUCKET>
+    ./emrclient configure -m <MASTER IP:PORT> -b <S3 BUCKET> -c <Cluster id> -r <REGION>
 
 ##### List Running Applications
     
