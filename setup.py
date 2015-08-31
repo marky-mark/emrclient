@@ -11,7 +11,7 @@ setup(
     author='Mark Kelly',
     author_email='mkelly28@tcd.ie',
     url='https://github.com/zalando/emrclient',
-    download_url='https://github.com/zalando/emrclient/tarball/0.1',
+    download_url='https://github.com/zalando/emrclient/tarball/0.0.1',
     keywords=['emr', 'aws', 'yarn', 'kill', 'view', 'client', 'spark', 'api'],
     classifiers=[],
     entry_points={'console_scripts': 'emrclient = emrclient.cli:main'},
