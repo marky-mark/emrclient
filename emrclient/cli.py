@@ -148,6 +148,14 @@ def get_config(s3_bucket, region, cluster_id):
 
         return Config(json_contents['master_address'], s3_bucket_to_use, region_to_use, cluster_id_to_use)
 
+@cli.command()
+@click.option('-c', '--cluster-id', help='Overwrite region of cluster. Not cached')
+@click.option('-r', '--region', help='Overwrite region of cluster. Not cached')
+@click.argument('id')
+def kill_step(id, cluster_id, region):
+    config = get_config(None, region, cluster_id)
+    emr_client = boto3.client('emr', region_name=config.region)
+    emr_client.terminate_job_flows(JobFlowIds=[id])
 
 @cli.command()
 @click.option('-c', '--cluster-id', help='Overwrite region of cluster. Not cached')
@@ -158,7 +166,7 @@ def list_steps(cluster_id, region, state):
     config = get_config(None, region, cluster_id)
 
     emr_client = boto3.client('emr', region_name=config.region)
-    result = emr_client.list_steps(ClusterId=config.cluster_id, StepStates=[state])
+    result = emr_client.list_stamazoeps(ClusterId=config.cluster_id, StepStates=[state])
 
     headers = ['Id', 'Name', 'Creation-Time', 'Start-Time', 'Finished-Time', 'Config']
     data = []
