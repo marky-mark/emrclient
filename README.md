@@ -26,7 +26,7 @@ in `~/.emrclient`
     
 Once this is set you may list applications by running
 
-    ./emrclient list_running
+    ./emrclient list_applications_running
 
 Alternatively the master may be temporally overwritten by using `-m <MASTER ADDRESS>`
    
@@ -34,7 +34,7 @@ Alternatively the master may be temporally overwritten by using `-m <MASTER ADDR
     
 Once this is set you may list applications by state(RUNNING, KILLED, FAILED)
 
-    ./emrclient list <STATE>
+    ./emrclient list_applications <STATE>
 
 Alternatively the master may be temporally overwritten by using `-m <MASTER ADDRESS>`
    
@@ -45,6 +45,17 @@ Pick an application from the list to kill
     ./emrclient kill <APPLICATION ID>
     
 Alternatively the master may be temporally overwritten by using `-m <MASTER ADDRESS>`
+
+##### List jobs on cluster
+
+List Jobs by state. 'PENDING','RUNNING','COMPLETED','CANCELLED','FAILED','INTERRUPTED'
+
+    ./emrclient list_steps <STATE>  
+    
+Options
+
+* -c, --cluster-id TEXT  Overwrite region of cluster. Not cached
+* -r, --region TEXT      Overwrite region of cluster. Not cached
 
 ##### Submit job
 
