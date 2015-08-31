@@ -12,8 +12,8 @@ import datetime
 import click
 from tabulate import tabulate
 
-from config import Config
-from yarncli import YarnClient
+from emrclient.config import Config
+from emrclient.yarncli import YarnClient
 
 import boto3
 
