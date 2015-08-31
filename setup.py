@@ -17,7 +17,7 @@ setup(
     entry_points={'console_scripts': 'emrclient = emrclient.cli:main'},
     tests_require=['pytest'],
     test_suite='tests',
-    packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
+    # packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
     install_requires=['clickclick','tabulate', 'boto3'],
     license='Apache License 2.0'
 )
