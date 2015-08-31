@@ -121,7 +121,7 @@ def normalise_time(time):
 @cli.command()
 @click.argument('application_id')
 @click.option('-m', '--master-address', help='Overwrite the address of master web api. Default port 8088. Not cached')
-def kill(application_id, master_address):
+def kill_application(application_id, master_address):
     yarn_client = build_yarn_client(master_address)
     if yarn_client.kill(application_id):
         print("successfully killed")

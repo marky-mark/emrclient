@@ -1,15 +1,14 @@
 ### EMR Client
 
 This is created to view and kill applications/jobs running on yarn inside Amazon EMR or any other remote location. 
-Currently the amazon api does not include stopping jobs. Also supports adding steps to EMR
+Currently the amazon api does not include stopping jobs. Also supports adding steps to EMR and listing them. The amazon 
+EMR api does not contain have calls to terminate jobs and so must be done via yarn api. A small layer of caching is also
+added.
 
-### Pre-requisites
+### Commands
 
-Yarn must be installed on machine
-
-#### Commands
-
-In order to use this the master ec2 instance created must be assigned a public ip 
+In order to use the `list_applications` and `kill_application` the master ec2 instance of EMR cluster created must be 
+assigned a public ip 
 
 ##### Display help
     
@@ -17,8 +16,9 @@ In order to use this the master ec2 instance created must be assigned a public i
 
 ##### Configure
 
-Set the master ip and port of the EMR master instance and yarn api (default 8088), this can be found in the EC2 tab. This caches the address 
-in `~/.emrclient`
+The purpose of this call is to cache some of the common parameters.
+Set the master ip and port of the EMR master instance and yarn api (default 8088), this can be found in the EC2 tab. The cache
+is currently in `~/.emrclient`
 
     ./emrclient configure -m <MASTER IP:PORT> -b <S3 BUCKET> -c <Cluster id> -r <REGION>
 
@@ -42,7 +42,7 @@ Alternatively the master may be temporally overwritten by using `-m <MASTER ADDR
 
 Pick an application from the list to kill
 
-    ./emrclient kill <APPLICATION ID>
+    ./emrclient kill_application <APPLICATION ID>
     
 Alternatively the master may be temporally overwritten by using `-m <MASTER ADDRESS>`
 
