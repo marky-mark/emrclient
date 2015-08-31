@@ -26,7 +26,7 @@ is currently in `~/.emrclient`
     
 Once this is set you may list applications by running
 
-    ./emrclient list_applications_running
+    ./emrclient list-applications-running
 
 Alternatively the master may be temporally overwritten by using `-m <MASTER ADDRESS>`
    
@@ -34,7 +34,7 @@ Alternatively the master may be temporally overwritten by using `-m <MASTER ADDR
     
 Once this is set you may list applications by state(RUNNING, KILLED, FAILED)
 
-    ./emrclient list_applications <STATE>
+    ./emrclient list-applications <STATE>
 
 Alternatively the master may be temporally overwritten by using `-m <MASTER ADDRESS>`
    
@@ -42,7 +42,7 @@ Alternatively the master may be temporally overwritten by using `-m <MASTER ADDR
 
 Pick an application from the list to kill
 
-    ./emrclient kill_application <APPLICATION ID>
+    ./emrclient kill-application <APPLICATION ID>
     
 Alternatively the master may be temporally overwritten by using `-m <MASTER ADDRESS>`
 
@@ -50,7 +50,7 @@ Alternatively the master may be temporally overwritten by using `-m <MASTER ADDR
 
 List Jobs by state. 'PENDING','RUNNING','COMPLETED','CANCELLED','FAILED','INTERRUPTED'
 
-    ./emrclient list_steps <STATE>  
+    ./emrclient list-steps <STATE>  
     
 Options
 
@@ -61,7 +61,7 @@ Options
 
 Pick an application from the list to kill
 
-    ./emrclient submit_job <NAME> <MAIN CLASS> 
+    ./emrclient submit-job <NAME> <MAIN CLASS> 
     
 Options
 
@@ -75,10 +75,10 @@ Options
     
 Example of file already up on s3
 
-    ./cli.py submit_job SmartProduct StreamingApp -a -m,yarn-cluster,-z,XXX.YYY.ZZZ:2181 -s s3://some-bucket/smart-product-assembly-0.0.1-SNAPSHOT.jar
+    ./cli.py submit-job Foo Bar -a -m,yarn-cluster,-z,XXX.YYY.ZZZ:2181 -s s3://some-bucket/some-jar-0.0.1-SNAPSHOT.jar
     
 Example of uploading file to s3 and using it
 
-    ./cli.py submit_job SmartProduct StreamingApp -a -m,yarn-cluster,-z,XXX.YYY.ZZZ:2181 -f /some/file.jar -b some-bucket
+    ./cli.py submit-job Foo Bar -a -m,yarn-cluster,-z,XXX.YYY.ZZZ:2181 -f /some/file.jar -b some-bucket
     
     

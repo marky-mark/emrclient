@@ -83,13 +83,13 @@ def normalise_master_address(master_address):
     return master_address
 
 
-@cli.command()
+@cli.command('list-applications-running')
 @click.option('-m', '--master-address', help='Overwrite the address of master web api. Default port 8088. Not cached')
 def list_applications_running(master_address):
     list_applications_by_state(master_address, 'RUNNING')
 
 
-@cli.command()
+@cli.command('list-applications')
 @click.argument('state')
 @click.option('-m', '--master-address', help='Overwrite the address of master web api. Default port 8088. Not cached')
 def list_applications(master_address, state):
@@ -118,7 +118,7 @@ def normalise_time(time):
     return '-'
 
 
-@cli.command()
+@cli.command('kill-application')
 @click.argument('application_id')
 @click.option('-m', '--master-address', help='Overwrite the address of master web api. Default port 8088. Not cached')
 def kill_application(application_id, master_address):
@@ -148,7 +148,7 @@ def get_config(s3_bucket, region, cluster_id):
 
         return Config(json_contents['master_address'], s3_bucket_to_use, region_to_use, cluster_id_to_use)
 
-@cli.command()
+@cli.command('kill-step')
 @click.option('-c', '--cluster-id', help='Overwrite region of cluster. Not cached')
 @click.option('-r', '--region', help='Overwrite region of cluster. Not cached')
 @click.argument('id')
@@ -157,7 +157,7 @@ def kill_step(id, cluster_id, region):
     emr_client = boto3.client('emr', region_name=config.region)
     emr_client.terminate_job_flows(JobFlowIds=[id])
 
-@cli.command()
+@cli.command('list-steps')
 @click.option('-c', '--cluster-id', help='Overwrite region of cluster. Not cached')
 @click.option('-r', '--region', help='Overwrite region of cluster. Not cached')
 # 'PENDING'|'RUNNING'|'COMPLETED'|'CANCELLED'|'FAILED'|'INTERRUPTED'
@@ -194,7 +194,7 @@ def list_steps(cluster_id, region, state):
 
     print(tabulate(data, headers, tablefmt='plain'))
 
-@cli.command()
+@cli.command('submit-job')
 @click.option('-f', '--file', help='Upload the file. This will be uploaded to s3 and overwrite whatever is there')
 @click.option('-b', '--s3-bucket',
               help='Overwrite the s3 bucket location for the file to be uploaded to. Does not get cached')
