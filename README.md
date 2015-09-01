@@ -5,6 +5,10 @@ Currently the amazon api does not include stopping jobs. Also supports adding st
 EMR api does not contain have calls to terminate jobs and so must be done via yarn api. A small layer of caching is also
 added.
 
+### Run 
+
+    python3 -m emrclient
+
 ### Install via pip
 
     pip3 install --upgrade emrclient
@@ -24,13 +28,13 @@ The purpose of this call is to cache some of the common parameters.
 Set the master ip and port of the EMR master instance and yarn api (default 8088), this can be found in the EC2 tab. The cache
 is currently in `~/.emrclient`
 
-    ./emrclient configure -m <MASTER IP:PORT> -b <S3 BUCKET> -c <Cluster id> -r <REGION>
+    emrclient configure -m <MASTER IP:PORT> -b <S3 BUCKET> -c <Cluster id> -r <REGION>
 
 ##### List Running Applications
     
 Once this is set you may list applications by running
 
-    ./emrclient list-applications-running
+    emrclient list-applications-running
 
 Alternatively the master may be temporally overwritten by using `-m <MASTER ADDRESS>`
    
@@ -38,7 +42,7 @@ Alternatively the master may be temporally overwritten by using `-m <MASTER ADDR
     
 Once this is set you may list applications by state(RUNNING, KILLED, FAILED)
 
-    ./emrclient list-applications <STATE>
+    emrclient list-applications <STATE>
 
 Alternatively the master may be temporally overwritten by using `-m <MASTER ADDRESS>`
    
@@ -46,7 +50,7 @@ Alternatively the master may be temporally overwritten by using `-m <MASTER ADDR
 
 Pick an application from the list to kill
 
-    ./emrclient kill-application <APPLICATION ID>
+    emrclient kill-application <APPLICATION ID>
     
 Alternatively the master may be temporally overwritten by using `-m <MASTER ADDRESS>`
 
@@ -54,7 +58,7 @@ Alternatively the master may be temporally overwritten by using `-m <MASTER ADDR
 
 List Jobs by state. 'PENDING','RUNNING','COMPLETED','CANCELLED','FAILED','INTERRUPTED'
 
-    ./emrclient list-steps <STATE>  
+    emrclient list-steps <STATE>  
     
 Options
 
@@ -65,7 +69,7 @@ Options
 
 Pick an application from the list to kill
 
-    ./emrclient submit-job <NAME> <MAIN CLASS> 
+    emrclient submit-job <NAME> <MAIN CLASS> 
     
 Options
 
@@ -79,10 +83,10 @@ Options
     
 Example of file already up on s3
 
-    ./cli.py submit-job Foo Bar -a -m,yarn-cluster,-z,XXX.YYY.ZZZ:2181 -s s3://some-bucket/some-jar-0.0.1-SNAPSHOT.jar
+    emrclient submit-job Foo Bar -a -m,yarn-cluster,-z,XXX.YYY.ZZZ:2181 -s s3://some-bucket/some-jar-0.0.1-SNAPSHOT.jar
     
 Example of uploading file to s3 and using it
 
-    ./cli.py submit-job Foo Bar -a -m,yarn-cluster,-z,XXX.YYY.ZZZ:2181 -f /some/file.jar -b some-bucket
+    emrclient submit-job Foo Bar -a -m,yarn-cluster,-z,XXX.YYY.ZZZ:2181 -f /some/file.jar -b some-bucket
     
     
