@@ -5,6 +5,13 @@ Currently the amazon api does not include stopping jobs. Also supports adding st
 EMR api does not contain have calls to terminate jobs and so must be done via yarn api. A small layer of caching is also
 added.
 
+### Pre-requisite
+
+The api must be exposed publicly. Either assign the master ec2 box a public ip or use an ssh tunnel like below. When setting up
+the EMR cluster the public key must be added to the cluster in order to ssh into the box (assuming runs on port 8088).
+
+    ssh -v -i <KEY LOCATION> -N -L 8088:<DNS PUBLIC IP>.eu-west-1.compute.amazonaws.com:8088 hadoop@<DNS PUBLIC IP>.eu-west-1.compute.amazonaws.com
+
 ### Run 
 
     python3 -m emrclient
