@@ -15,6 +15,6 @@ setup(
     # tests_require=['pytest'],
     test_suite='tests',
     # packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
-    install_requires=['clickclick','tabulate', 'boto3'],
+    install_requires=['clickclick','tabulate', 'boto3','requests'],
     license='Apache License 2.0'
 )
